@@ -6,6 +6,36 @@ import "ntest:ntest.ny";
 import "args.ny";
 
 @test
+func test_ordered_tokens_preserve_spelling_and_value_boundaries() {
+  let argv: <string>[8] = {
+    "nyrac", "-O2", "--link-arg=-Wl,a=b", "--name=", "--path", "--", "-", "--missing"
+  };
+  let optimize: ArgToken = ArgToken.At(argv, 1);
+  AssertEqString(optimize.Raw(), "-O2");
+  AssertTrue(optimize.IsOption());
+
+  let linked: ArgToken = ArgToken.At(argv, 2);
+  AssertTrue(linked.Matches("--link-arg") && !linked.Matches("--link"));
+  AssertTrue(linked.HasAttachedValue());
+  AssertEqString(linked.Name(), "--link-arg");
+  AssertEqString(linked.Value(), "-Wl,a=b");
+  AssertEqI32(linked.AfterValue(), 3);
+
+  let empty: ArgToken = ArgToken.At(argv, linked.AfterValue());
+  AssertTrue(empty.HasValue());
+  AssertEqString(empty.Value(), "");
+
+  let separate: ArgToken = ArgToken.At(argv, empty.AfterValue());
+  AssertTrue(separate.HasFollowing() && !separate.HasAttachedValue());
+  AssertEqString(separate.Value(), "--");
+  AssertTrue(ArgToken.At(argv, separate.Index() + 1).IsDelimiter());
+
+  let dash: ArgToken = ArgToken.At(argv, separate.AfterValue());
+  AssertTrue(!dash.IsOption() && dash.IsOption(bare_dash: true));
+  AssertTrue(!ArgToken.At(argv, 7).HasValue());
+}
+
+@test
 func test_flags_aliases_and_long_and_short_values() {
   var parser = ArgParser.New();
   var aliases = Array<string>.New();

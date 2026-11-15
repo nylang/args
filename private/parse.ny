@@ -48,18 +48,19 @@ pub method(ArgParser) Parse(arguments: ref <string>[], { start: int32 = 0 }) -> 
 
 method(ArgCursor) Take(parser: ref ArgParser, arguments: ref <string>[]) -> ArgError? {
   let index = self.next;
-  let token: string = arguments[index];
+  let argument: ArgToken = ArgToken.At(arguments, index);
+  let token: string = argument.Raw();
   self.next += 1;
   let level = self.scopes.Len() - 1;
   if !self.stop {
-    if token == "--" {
+    if argument.IsDelimiter() {
       self.stop = true;
       return nil;
     }
     if token.StartsWith("--") {
-      return self.TakeLong(parser, arguments, token, index);
+      return self.TakeLong(parser, arguments, argument, index);
     }
-    if token.length > 1 && token[0] == '-' {
+    if argument.IsOption() {
       return self.TakeShort(parser, arguments, token, index);
     }
 
@@ -80,19 +81,18 @@ method(ArgCursor) Take(parser: ref ArgParser, arguments: ref <string>[]) -> ArgE
 }
 
 method(ArgCursor) TakeLong(
-  parser: ref ArgParser, arguments: ref <string>[], token: ref string, index: int32
+  parser: ref ArgParser, arguments: ref <string>[], argument: ref ArgToken, index: int32
 ) -> ArgError? {
-  let equals = token.FindByte('=');
-  let end = equals < 0 ? token.length : equals;
-  let name = token.View(2, end - 2);
+  let spelling = argument.Name();
+  let name = spelling.View(2, spelling.length - 2);
   let selected = self.Match(parser, name, false);
   if selected.option < 0 {
     return self.Error(ArgErrorKind.UnknownOption, index, name, self.scopes.Len() - 1, "unknown option");
   }
 
   var attached: string? = nil;
-  if equals >= 0 {
-    attached = token.View(equals + 1, token.length - equals - 1);
+  if argument.HasAttachedValue() {
+    attached = argument.Value();
   }
 
   return self.Apply(parser, arguments, selected, attached, index);

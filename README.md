@@ -60,5 +60,13 @@ Running the example as `app -vf=json input.ny -- --literal` prints
   kind, input index, option and command. `Usage()` renders visible options
   and immediate child commands for the parser.
 
+Use `ArgToken.At(argv, index)` for ordered grammars that apply options as
+they encounter them. `Raw()` preserves exact spellings such as `-O2`.
+`Matches("--name")` accepts the exact name or the `--name=value` spelling.
+`HasValue()` distinguishes a missing operand from an explicitly empty one.
+`Value()` reads an attached operand or the following argv entry, and
+`AfterValue()` gives the index at which to resume. Use `IsDelimiter()`
+when an invocation forwards the rest of argv to another program.
+
 Run the package suite with `nyrac test .` from a standalone checkout.
 From the NyraLang checkout, run `nyrac --workspace workspace.yaml test third_party/args`.

@@ -5,6 +5,7 @@
 module CommandLineArguments;
 part "definitions.ny";
 part "parse.ny";
+part "token.ny";
 part "results.ny";
 part "usage.ny";
 import "stdlib:stdlib.ny";

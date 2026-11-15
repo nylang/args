@@ -35,6 +35,48 @@ pub struct ArgOptionSettings {
   hidden: bool;
 }
 
+/** @brief One token and its lookahead for an ordered command-line grammar.
+ * @note Use this for grammars that apply each occurrence immediately or have context-specific spellings. */
+pub struct ArgToken;
+
+/** @brief Read an in-range token and its optional successor. The snapshot owns the text. */
+pub static method(ArgToken) At(arguments: ref <string>[], index: int32) -> ArgToken;
+
+/** @brief Return the original spelling, including any attached value. */
+pub method(ArgToken) Raw() -> string;
+
+/** @brief Return the zero-based index of this token in the input array. */
+pub method(ArgToken) Index() -> int32;
+
+/** @brief Return the spelling before the first equals sign. */
+pub method(ArgToken) Name() -> string;
+
+/** @brief Check for a hyphen-prefixed option or delimiter.
+ * @note A single hyphen is positional unless bare_dash is enabled. */
+pub method(ArgToken) IsOption({ bare_dash: bool = false }) -> bool;
+
+/** @brief Check for the exact end-of-options marker. */
+pub method(ArgToken) IsDelimiter() -> bool;
+
+/** @brief Match a spelling with an optional equals-delimited value. */
+pub method(ArgToken) Matches(spelling: ref string) -> bool;
+
+/** @brief Report whether an equals sign supplies a value, including an empty one. */
+pub method(ArgToken) HasAttachedValue() -> bool;
+
+/** @brief Report whether there is another argv token, regardless of its spelling. */
+pub method(ArgToken) HasFollowing() -> bool;
+
+/** @brief Report whether an attached value or a following token is present.
+ * @note The caller chooses whether a following delimiter is a valid operand. */
+pub method(ArgToken) HasValue() -> bool;
+
+/** @brief Return the attached value or following token, or empty text when neither exists. */
+pub method(ArgToken) Value() -> string;
+
+/** @brief Return the first unconsumed index after an option with a present value. */
+pub method(ArgToken) AfterValue() -> int32;
+
 /** @brief Reusable definitions for a command line or subcommand. */
 pub struct ArgParser;
 
