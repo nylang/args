@@ -60,5 +60,5 @@ Running the example as `app -vf=json input.ny -- --literal` prints
   kind, input index, option and command. `Usage()` renders visible options
   and immediate child commands for the parser.
 
-For this checkout, run the package suite with
-`nyrac --workspace workspace.yaml test third_party/args`.
+Run the package suite with `nyrac test .` from a standalone checkout.
+From the NyraLang checkout, run `nyrac --workspace workspace.yaml test third_party/args`.
