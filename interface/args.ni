@@ -39,7 +39,8 @@ pub struct ArgOptionSettings {
  * @note Use this for grammars that apply each occurrence immediately or have context-specific spellings. */
 pub struct ArgToken;
 
-/** @brief Read an in-range token and its optional successor. The snapshot owns the text. */
+/** @brief Read an in-range token and its optional successor.
+ * @note The snapshot retains managed strings. External argv bytes must outlive the snapshot and its views. */
 pub static method(ArgToken) At(arguments: ref <string>[], index: int32) -> ArgToken;
 
 /** @brief Return the original spelling, including any attached value. */
